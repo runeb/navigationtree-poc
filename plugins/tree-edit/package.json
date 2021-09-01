@@ -1,0 +1,15 @@
+{
+  "name": "sanity-plugin-tree-edit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Rune Botten",
+  "license": "ISC",
+  "dependencies": {
+    "react-sortable-tree": "^2.8.0"
+  }
+}

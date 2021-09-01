@@ -1,0 +1,12 @@
+{
+  "types": [
+    {
+      "name": "category",
+      "title": "title"
+    },
+    {
+      "name": "article",
+      "title": "heading"
+    }
+  ]
+}
