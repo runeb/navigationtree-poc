@@ -13,6 +13,7 @@ const client = sanityClient.withConfig({
 });
 
 const TreeEdit = () => {
+  const [loading, setLoading] = useState(true)
   const [treeData, setTreeData] = useState([]);
   const [type, setType] = useState(config.types[0]);
 
@@ -22,6 +23,7 @@ const TreeEdit = () => {
   useEffect(() => {
     const query = `* [_type == $type]`;
     const fetchData = async () => {
+      setLoading(true)
       client.fetch(query, { type: type.name }).then((categories) => {
         const findChildren = (parentId) =>
           categories
@@ -47,6 +49,7 @@ const TreeEdit = () => {
           .filter((c) => !!c);
 
         setTreeData(data);
+        setLoading(false)
       })
     };
     fetchData();
@@ -58,9 +61,7 @@ const TreeEdit = () => {
           visibility: "query",
         }
       )
-      .subscribe(() => {
-        setTimeout(fetchData, 1000);
-      });
+      .subscribe(fetchData)
     return () => {
       subscription.unsubscribe();
     };
@@ -103,6 +104,7 @@ const TreeEdit = () => {
           };
         }}
         treeData={treeData}
+        canDrop={() => !loading}
         onMoveNode={(params) => {
           console.log("move", params);
           console.log("index", params.path.pop());
@@ -115,7 +117,8 @@ const TreeEdit = () => {
               parent: { _type: "reference", _ref: nextParentNode._id },
             });
           }
-          patch.commit();
+          setLoading(true)
+          patch.commit()
         }}
         onChange={setTreeData}
       />
