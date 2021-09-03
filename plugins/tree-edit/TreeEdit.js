@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import IntentButton from "part:@sanity/components/buttons/intent";
 import SortableTree from "react-sortable-tree";
 import "react-sortable-tree/style.css?raw";
+import {usePaneRouter} from "@sanity/desk-tool"
 import sanityClient from "part:@sanity/base/client";
 import { useEditState } from "@sanity/react-hooks";
 import { EditIcon } from "@sanity/icons";
 import config from "config:tree-edit";
-import { Card, Stack, Select } from "@sanity/ui";
+import { Card, Stack, Select, Button } from "@sanity/ui";
 
 const client = sanityClient.withConfig({
   apiVersion: "2021-09-01",
 });
 
-const TreeEdit = () => {
-  const [loading, setLoading] = useState(true)
+const TreeEdit = (props) => {
+  const [loading, setLoading] = useState(true);
   const [treeData, setTreeData] = useState([]);
   const [type, setType] = useState(config.types[0]);
 
@@ -23,7 +24,7 @@ const TreeEdit = () => {
   useEffect(() => {
     const query = `* [_type == $type]`;
     const fetchData = async () => {
-      setLoading(true)
+      setLoading(true);
       client.fetch(query, { type: type.name }).then((categories) => {
         const findChildren = (parentId) =>
           categories
@@ -49,8 +50,8 @@ const TreeEdit = () => {
           .filter((c) => !!c);
 
         setTreeData(data);
-        setLoading(false)
-      })
+        setLoading(false);
+      });
     };
     fetchData();
     const subscription = client.observable
@@ -61,7 +62,7 @@ const TreeEdit = () => {
           visibility: "query",
         }
       )
-      .subscribe(fetchData)
+      .subscribe(fetchData);
     return () => {
       subscription.unsubscribe();
     };
@@ -69,38 +70,13 @@ const TreeEdit = () => {
 
   return (
     <div style={{ height: 400 }}>
-      <Card padding={4}>
-        <Stack>
-          <Select
-            onChange={(e) => {
-              setType(config.types.find((t) => t.name === e.target.value));
-            }}
-            fontSize={[2, 2, 3, 4]}
-            padding={[3, 3, 4]}
-            space={[3, 3, 4]}
-          >
-            {config.types.map((type) => (
-              <option>{type.name}</option>
-            ))}
-          </Select>
-        </Stack>
-      </Card>
-      {!treeData.length && (<h2>No documents</h2>)}
+      {!loading && !treeData.length && <h2>No documents</h2>}
       <SortableTree
         generateNodeProps={({ node }) => {
           const hasChanges = node._id.match(/drafts./);
           const id = node._id.split("drafts.").pop();
           return {
-            buttons: [
-              <IntentButton
-                icon={hasChanges ? EditIcon : null}
-                intent="edit"
-                mode="ghost"
-                params={{ id, type }}
-              >
-                Edit
-              </IntentButton>,
-            ],
+            buttons: [<ChildEditLink id={id}/>]
           };
         }}
         treeData={treeData}
@@ -117,13 +93,32 @@ const TreeEdit = () => {
               parent: { _type: "reference", _ref: nextParentNode._id },
             });
           }
-          setLoading(true)
-          patch.commit()
+          setLoading(true);
+          patch.commit();
         }}
         onChange={setTreeData}
       />
     </div>
   );
 };
+
+const ChildEditLink = ({id}) => {
+  const {ChildLink} = usePaneRouter()
+  const Link = useCallback((linkProps) => <ChildLink {...linkProps} childId={id} />, [
+    ChildLink,
+    id,
+  ])
+
+  return (
+    <Button
+      as={Link}
+      text={
+        <>
+          Edit
+        </>
+      }
+    />
+  )
+}
 
 export default TreeEdit;
