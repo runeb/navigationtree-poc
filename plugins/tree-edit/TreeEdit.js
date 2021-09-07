@@ -69,7 +69,7 @@ const TreeEdit = (props) => {
   }, [type]);
 
   return (
-    <div style={{ height: 400 }}>
+    <div style={{ height: "100%" }}>
       {!loading && !treeData.length && <h2>No documents</h2>}
       <SortableTree
         generateNodeProps={({ node }) => {
