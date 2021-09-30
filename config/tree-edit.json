@@ -2,11 +2,8 @@
   "types": [
     {
       "name": "category",
-      "title": "title"
-    },
-    {
-      "name": "article",
-      "title": "heading"
+      "title": "title",
+      "parentRefField": "parent"
     }
   ]
 }
