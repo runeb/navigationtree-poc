@@ -1,14 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import IntentButton from "part:@sanity/components/buttons/intent";
 import SortableTree from "react-sortable-tree";
 import "react-sortable-tree/style.css?raw";
 import { usePaneRouter } from "@sanity/desk-tool";
 import sanityClient from "part:@sanity/base/client";
-import { useEditState } from "@sanity/react-hooks";
-import { EditIcon } from "@sanity/icons";
-import config from "config:tree-edit";
-import { Card, Stack, Select, Button } from "@sanity/ui";
-import { DocumentPaneItemPreview } from "@sanity/desk-tool/lib/components/DocumentPaneItemPreview";
+import Preview from 'part:@sanity/base/preview'
+
 import schema from "part:@sanity/base/schema"
 
 const client = sanityClient.withConfig({
@@ -79,9 +75,9 @@ const TreeEdit = (props) => {
           const id = node._id.split("drafts.").pop();
 
           return {
-            title: <DocumentPaneItemPreview
+            title: <Preview
               layout={"default"}
-              schemaType={schemaType}
+              type={schemaType}
               value={node}
             />,
             onClick: () => navigateIntent("edit", {type: schemaType.name, id: node._id})

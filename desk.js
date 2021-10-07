@@ -23,6 +23,7 @@ export default () => {
   return S.list()
     .title("Content")
     .items([
+      S.documentTypeListItem('category'),
       S.listItem()
         .title("Categories")
         .child(
